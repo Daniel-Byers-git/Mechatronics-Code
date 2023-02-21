@@ -1,0 +1,47 @@
+CXXFLAGS += -g -std=c++14 -Werror -Wno-unused-result -Wno-write-strings -I.
+LDFLAGS += -g -std=c++14 -lpthread 
+
+SRC_FILES = game.cpp \
+			 player.cpp \
+			 save.cpp 
+
+BUILD_OBJS = $(BUILD_SRCS:.cpp=.o) #output files are often .o
+# gcov is a test coverage program. 
+# Use it in concert with GCC to analyze your programs to 
+# help create more efficient, faster running code and to discover 
+# untested parts of your program. You can use gcov as a profiling 
+# tool to help discover where your optimization efforts will best 
+# affect your code. You can also use gcov along with the other 
+# profiling tool, gprof, to assess which parts of your code
+# use the greatest amount of computing time.
+BUILD_GCNO = $(BUILD_SRCS:.cpp=.gcno)
+BUILD_GCDA = $(BUILD_SRCS:.cpp=.gcda)
+
+# # Outputs "hey", since this is the first target
+# echo $@
+# # Outputs all prerequisites newer than the target
+# echo $?
+# # Outputs all prerequisites
+# echo $^
+
+game: $(BUILD_OBJS) 
+	$(CXX) -o $@.exe $^ $(SRC_FILES) $(CXXFLAGS)
+
+install:
+	mkdir bin
+	install -m 4755 game.exe bin/
+
+clean:
+	rm -f game.exe
+	rm -rf bin
+	rm -f $(BUILD_OBJS)
+	rm -f $(BUILD_GCNO)
+	rm -f $(BUILD_GCDA)
+
+coverage: clean
+	$(MAKE) COVERAGE=1
+
+# Auto-build dependency files for all of our source files example
+# include $(wildcard $(patsubst %,$(DEPDIR)/%,$(basename $(SRC_FILES))))
+
+.PHONY: install clean coverage 
